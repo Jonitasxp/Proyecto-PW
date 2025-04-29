@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bienvenido a MusicApp</title>
+  <link rel="stylesheet" href="/css/estilos.css" />
+</head>
+<body>
+  <!-- Barra de navegación -->
+  <header class="header">
+    <h1>Bienvenido, <%= user.username %></h1>
+    <nav class="navbar">
+      <a href="/logout">Cerrar sesión</a>
+      <a href="/home">Inicio</a>
+    </nav>
+  </header>
+
+  <!-- Sección hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Explora la mejor música</h2>
+      <p>Escucha, descubre y guarda tus canciones favoritas</p>
+    </div>
+  </section>
+
+  <!-- Contenedor de canciones -->
+  <main class="canciones-container">
+    <% if (canciones.length === 0) { %>
+      <p>No hay canciones disponibles por ahora.</p>
+    <% } else { %>
+      <div class="canciones-grid">
+        <% canciones.forEach(cancion => { %>
+          <div class="cancion-card">
+            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?fit=crop&w=800&q=80" alt="Cover" class="cover-img" />
+            <h3><%= cancion.nombre %></h3>
+            <p><strong>Artista:</strong> <%= cancion.artista %></p>
+            <p><strong>Género:</strong> <%= cancion.genero %></p>
+            <button class="btn-reproducir">▶ Escuchar</button>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 MusicApp. Todos los derechos reservados.</p>
+  </footer>
+</body>
+</html>
