@@ -3,49 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bienvenido a MusicApp</title>
+  <title>MusicApp - Inicio</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="/css/estilos.css" />
 </head>
 <body>
   <!-- Barra de navegación -->
-  <header class="header">
-    <h1>Bienvenido, <%= user.username %></h1>
-    <nav class="navbar">
-      <a href="/logout">Cerrar sesión</a>
-      <a href="/home">Inicio</a>
-    </nav>
-  </header>
-
-  <!-- Sección hero -->
-  <section class="hero">
-    <div class="hero-content">
-      <h2>Explora la mejor música</h2>
-      <p>Escucha, descubre y guarda tus canciones favoritas</p>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/home">MusicApp</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/agregar">Agregar Canción</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Cerrar sesión</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </section>
+  </nav>
 
-  <!-- Contenedor de canciones -->
-  <main class="canciones-container">
+  <!-- Contenido principal -->
+  <div class="container mt-5">
+    <h2>Bienvenido, <%= user.username %>!</h2>
+    <p>Explora, guarda y escucha tus canciones favoritas.</p>
+
+    <!-- Lista de canciones -->
+    <h3 class="mt-4">Lista de Canciones</h3>
+
     <% if (canciones.length === 0) { %>
-      <p>No hay canciones disponibles por ahora.</p>
+      <p class="text-muted">No hay canciones disponibles.</p>
     <% } else { %>
-      <div class="canciones-grid">
+      <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
         <% canciones.forEach(cancion => { %>
-          <div class="cancion-card">
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?fit=crop&w=800&q=80" alt="Cover" class="cover-img" />
-            <h3><%= cancion.nombre %></h3>
-            <p><strong>Artista:</strong> <%= cancion.artista %></p>
-            <p><strong>Género:</strong> <%= cancion.genero %></p>
-            <button class="btn-reproducir">▶ Escuchar</button>
+          <div class="col">
+            <div class="card h-100">
+              <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?fit=crop&w=800&q=80" class="card-img-top" alt="Portada canción" />
+              <div class="card-body">
+                <h5 class="card-title"><%= cancion.nombre %></h5>
+                <p class="card-text"><strong>Artista:</strong> <%= cancion.artista %></p>
+                <p class="card-text"><strong>Género:</strong> <%= cancion.genero %></p>
+
+                <% if (cancion.archivo) { %>
+                  <audio controls style="width: 100%;">
+                    <source src="/<%= cancion.archivo %>" type="audio/mpeg" />
+                    Tu navegador no soporta la reproducción de audio.
+                  </audio>
+                <% } else { %>
+                  <p class="text-muted">Audio no disponible</p>
+                <% } %>
+
+                <% if (cancion.archivo_letra) { %>
+                  <a href="/<%= cancion.archivo_letra %>" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                    Ver Letra
+                  </a>
+                <% } else { %>
+                  <p class="text-muted mt-2">Letra no disponible</p>
+                <% } %>
+              </div>
+            </div>
           </div>
         <% }) %>
       </div>
     <% } %>
-  </main>
+  </div>
 
-  <!-- Footer -->
-  <footer class="footer">
+  <footer class="footer bg-dark text-light text-center mt-5 py-3">
     <p>&copy; 2025 MusicApp. Todos los derechos reservados.</p>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

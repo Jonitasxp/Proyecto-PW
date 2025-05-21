@@ -3,10 +3,13 @@ const path = require("path");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const mysql = require("mysql");
+const multer = require("multer");
 
 const app = express();
 const PORT = 3000;
+
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/music', express.static('music'));
 
 const db = mysql.createConnection({
   host: "localhost",
@@ -36,6 +39,30 @@ app.use(
   })
 );
 
+// Configuración de multer para archivos
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "public", "music"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (file.fieldname === 'audio' && ext === ".mp3") {
+    cb(null, true);
+  } else if (file.fieldname === 'letra' && ext === ".txt") {
+    cb(null, true);
+  } else {
+    cb(new Error("Extensión de archivo no permitida. Audio debe ser .mp3 y Letra debe ser .txt"));
+  }
+};
+
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
+// Rutas
 
 app.get("/register", (req, res) => {
   res.render("register");
@@ -89,59 +116,102 @@ app.get("/", (req, res) => {
   if (req.session.user) {
     const user = req.session.user;
 
-    if (user.rol === "admin") {
-      db.query("SELECT * FROM canciones", (err, canciones) => {
-        if (err) {
-          console.error("Error:", err);
-          res.send("Error cargando las canciones");
-          return;
-        }
-        res.render("index", { user, canciones }); // vista del admin
-      });
-
-    } else {
-      db.query("SELECT * FROM canciones", (err, canciones) => {
-        if (err) {
-          console.error("Error:", err);
-          res.send("Error cargando las canciones");
-          return;
-        }
-        res.render("usuario", { user, canciones }); // vista del usuario
-      });
-    }
-
+    db.query("SELECT * FROM canciones", (err, canciones) => {
+      if (err) {
+        console.error("Error:", err);
+        res.send("Error cargando las canciones");
+        return;
+      }
+      if (user.rol === "admin") {
+        res.render("index", { user, canciones });
+      } else {
+        res.render("usuario", { user, canciones });
+      }
+    });
   } else {
-    res.render("home"); // no ha iniciado sesión
+    res.render("home");
   }
 });
 
-
-app.get("/agregar", (req, res) => {
-  if (req.session.user) {
-    res.render("agregar");  
-  } else {
-    res.redirect("/login");  
-  }
+app.get('/agregar', (req, res) => {
+  res.render('agregar');
 });
 
-
-
-app.post("/agregar", (req, res) => {
+app.post("/agregar", upload.fields([
+  { name: "audio", maxCount: 1 },
+  { name: "letra", maxCount: 1 }
+]), (req, res) => {
   const { nombre, artista, genero } = req.body;
 
+  if (!req.files || !req.files["audio"] || !req.files["letra"]) {
+    return res.send("Debes subir un archivo de audio y un archivo de letra.");
+  }
+
+  const audioFile = "music/" + req.files["audio"][0].filename;
+  const letraFile = "music/" + req.files["letra"][0].filename;
+
   db.query(
-    "INSERT INTO canciones (nombre, artista, genero) VALUES (?, ?, ?)",
-    [nombre, artista, genero],
+    "INSERT INTO canciones (nombre, artista, genero, archivo, archivo_letra) VALUES (?, ?, ?, ?, ?)",
+    [nombre, artista, genero, audioFile, letraFile],
     (err, result) => {
       if (err) {
         console.error("Error al guardar la canción:", err);
-        res.send("Ocurrió un error al guardar la canción.");
-        return;
+        return res.send("Ocurrió un error al guardar la canción: " + err.message);
       }
-      res.redirect("/");  
+      res.redirect("/");
     }
   );
 });
+
+app.get('/editar/:id', (req, res) => {
+  const id = req.params.id;
+  const query = 'SELECT * FROM canciones WHERE id = ?';
+
+db.query(query, [id], (error, resultados) => {
+    if (error) {
+      return res.status(500).send('Error al obtener la canción');
+    }
+    if (resultados.length === 0) {
+      return res.status(404).send('Canción no encontrada');
+    }
+
+    res.render('editar', { cancion: resultados[0] });
+  });
+});
+
+
+
+app.post('/editar/:id', upload.fields([{ name: 'audio' }, { name: 'letra' }]), (req, res) => {
+  const id = req.params.id;
+  const { nombre, artista, genero } = req.body;
+
+  let query = 'UPDATE canciones SET nombre = ?, artista = ?, genero = ?';
+  const valores = [nombre, artista, genero];
+
+  // Verificar si se subió un nuevo archivo de audio
+  if (req.files && req.files.audio && req.files.audio.length > 0) {
+    query += ', archivo = ?';
+    valores.push(req.files.audio[0].filename); // o .originalname si prefieres
+  }
+
+  // Verificar si se subió un nuevo archivo de letra
+  if (req.files && req.files.letra && req.files.letra.length > 0) {
+    query += ', archivo_letra = ?';
+    valores.push(req.files.letra[0].filename);
+  }
+
+  query += ' WHERE id = ?';
+  valores.push(id);
+
+db.query(query, valores, (error, resultado) => {
+    if (error) {
+      console.error('Error al actualizar:', error);
+      return res.status(500).send('Error al actualizar la canción');
+    }
+    res.redirect('/');
+  });
+});
+
 
 app.get("/logout", (req, res) => {
   req.session.destroy((err) => {

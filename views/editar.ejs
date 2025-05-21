@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Canción</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" />
+</head>
+<body>
+  <div class="container mt-5">
+    <h2>Editar Canción</h2>
+    <form action="/editar/<%= cancion.id %>" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="nombre" name="nombre" value="<%= cancion.nombre %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="artista" class="form-label">Artista</label>
+        <input type="text" class="form-control" id="artista" name="artista" value="<%= cancion.artista %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="genero" class="form-label">Género</label>
+        <input type="text" class="form-control" id="genero" name="genero" value="<%= cancion.genero %>" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="audio" class="form-label">Archivo MP3 (opcional)</label>
+        <input type="file" class="form-control" id="audio" name="audio" accept=".mp3">
+        <% if (cancion.archivo) { %>
+          <small class="text-muted">Archivo actual: <%= cancion.archivo %></small>
+        <% } %>
+      </div>
+
+      <div class="mb-3">
+        <label for="letra" class="form-label">Letra (TXT, opcional)</label>
+        <input type="file" class="form-control" id="letra" name="letra" accept=".txt">
+        <% if (cancion.archivo_letra) { %>
+          <small class="text-muted">Letra actual: <%= cancion.archivo_letra %></small>
+        <% } %>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+      <a href="/" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+</body>
+</html>

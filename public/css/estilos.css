@@ -54,11 +54,17 @@ body {
   }
   
   a {
-    color: #ab47bc;
+    color: #ffffff;
+    text-decoration: none;
+    font-family:sans-serif;
+    font-size: 15px;
+    padding-top: 7px;
+    padding-left: 5px;
   }
   
   a:hover {
-    color: #8e24aa;
+    color: #99f0ff;
+    text-decoration: none;
   }
   
   body {
@@ -68,6 +74,8 @@ body {
   .card-header {
     background-color: #6f42c1;
   }
+
+  
   
   .btn-primary {
     background-color: #6f42c1;
@@ -75,17 +83,11 @@ body {
   }
   
   .navbar {
-    background-color: #58e3ef;
+    background-color: #0905eb;
+    height: 30px;
   }
   
-  .navbar .nav-link.active {
-    color: rgb(25, 219, 151);
-  }
-  
-  .navbar .nav-link:hover {
-    color: #f8f9fa;
-  }
-  
+
   .card-body {
     background-color: #c20db3;
     border-radius: 10px;

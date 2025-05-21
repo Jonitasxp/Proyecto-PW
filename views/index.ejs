@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Música Jonas</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">Letras de Música</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
@@ -33,7 +41,7 @@
   <div class="container mt-5">
     <h2>Bienvenido, <%= user.username %>!</h2>
     <p>Esta es la página Principal de Letras Música</p>
-    
+
     <!-- Tabla de canciones -->
     <h3 class="mt-4">Lista de Canciones</h3>
     <table class="table table-bordered mt-3">
@@ -42,6 +50,9 @@
           <th>Nombre</th>
           <th>Artista</th>
           <th>Género</th>
+          <th>Reproducir</th>
+          <th>Letra</th>
+          <th>Editar</th> <!-- Nueva columna para el botón editar -->
         </tr>
       </thead>
       <tbody>
@@ -50,6 +61,30 @@
             <td><%= cancion.nombre %></td>
             <td><%= cancion.artista %></td>
             <td><%= cancion.genero %></td>
+            <td>
+              <% if (cancion.archivo) { %>
+                <audio controls>
+                  <source src="/<%= cancion.archivo %>" type="audio/mpeg" />
+                  Tu navegador no soporta el elemento de audio.
+                </audio>
+              <% } else { %>
+                No disponible
+              <% } %>
+            </td>
+            <td>
+              <% if (cancion.archivo_letra) { %>
+                <a href="/<%= cancion.archivo_letra %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                  Ver Letra
+                </a>
+              <% } else { %>
+                No disponible
+              <% } %>
+            </td>
+            <td>
+              <a href="/editar/<%= cancion.id %>" class="btn btn-sm btn-warning">
+                <i class="fas fa-edit"></i> Editar
+              </a>
+            </td>
           </tr>
         <% }); %>
       </tbody>
